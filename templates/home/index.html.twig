@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum : Sujets récents{% endblock %}
+
+{% block body %}
+
+<h4>Catégories</h4>
+
+<ul class="list-group">
+
+    <div class="row flex">
+    
+    {% for category in categories %}
+        <a href="{{ path('home_category', {slug: category.slug}) }}"><li class="list-group-item mx-2 my-2 {% if category == currCategory %} active {% endif %}">{{ category.name }}</li></a>
+    {% endfor %}
+    </div>
+</ul>
+
+<hr>
+
+<h5>Sujets récents : {{ currCategory.name }}</h5>
+
+<hr>
+
+
+<div class="row">
+    <div class="col-6">
+        <div class="pagination">
+            {{ knp_pagination_render(topics) }}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="text-right">
+            {{ form_start(formTopicSearch) }}
+
+            {{ form_row(formTopicSearch.research, { attr: { placeholder: 'Recherche' }}) }}
+
+            {{ form_widget(formTopicSearch) }}
+
+            <button type="submit" class="btn btn-success">Rechercher</button>
+
+            {{ form_end(formTopicSearch) }}
+
+            <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
+        </div>
+    </div>
+</div>
+
+
+<hr>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Posts</th>
+      <th scope="col">Titre</th>
+      <th scope="col">Pseudo</th>
+      <th scope="col">Dernier MSG</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for topic in topics %}
+    <tr>
+    {{ loop.index }}
+      <td>{{ topic.getNbPosts }}</td>
+      <td><a href="{{ path('topic_show', {slug: topic.slug, id: topic.id}) }}" style="display: block; width: 100%">{{ topic.title }}</a></td>
+      <td><a href="{{ path('user_show', {pseudo: topic.user.pseudo}) }}" style="display: block; width: 100%">{{ topic.user.pseudo }}</a></td>
+      <td>{{ topic.getLastPostDate | date('d/m/Y à H:i') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="pagination">
+    {{ knp_pagination_render(topics) }}
+</div>
+
+<hr>
+
+<h5>Poster un sujet</h5>
+
+{% if app.user %}
+
+    <hr>
+
+    {{ form_start(formTopic) }}
+
+    {{ form_row(formTopic.title, {label : 'Titre'}) }}
+
+    {{ form_row(formTopic.content, {label : 'Contenu'}) }}
+
+    <button type="submit" class="btn btn-success">Poster</button>
+
+    {{ form_end(formTopic) }}
+{% else %}
+    <p>Vous devez être connecté pour poster un sujet.<br /><a href="{{ path('login') }}" class="btn btn-success">Se connecter</a></p>
+    
+
+{% endif %}
+
+
+{% endblock %}

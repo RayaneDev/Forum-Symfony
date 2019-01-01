@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css" />
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" id="top">
+            <div class="container">
+                <a class="navbar-brand" href="#">Forum</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item {% if page == 'home' %} active {% endif %}">
+                            <a class="nav-link" href="{{ path('home_index') }}">Accueil {% if page == 'home' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                        </li>
+                        {% if app.user %}
+                            <li class="nav-item {% if page == 'profile' %} active {% endif %}">
+                                <a class="nav-link" href="{{ path('user_show', {pseudo : app.user.pseudo}) }}">Mon profil ({{ app.user.pseudo }}) {% if page == 'profile' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                            </li>
+                            <li class="nav-item {% if page == 'messagerie' %} active {% endif %}">
+                                <a class="nav-link" href="{{ path('home_index') }}">Messagerie (0) {% if page == 'messagerie' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="collapse navbar-collapse navbar-right">
+                    <ul class="navbar-nav ml-auto">
+                        {% if not app.user %}
+                            <li class="nav-item {% if page == 'register' %} active {% endif %}">
+                                <a class="nav-link btn btn-primary mr-2" href="{{ path('home_register') }}">Inscription {% if page == 'register' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                            </li>
+                            <li class="nav-item {% if page == 'login' %} active {% endif %}">
+                                <a class="nav-link btn btn-secondary" href="{{ path('login') }}">Connexion {% if page == 'login' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-secondary" href="{{ path('logout') }}">Déconnexion</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-3">
+            {% for msg in app.flashes('success') %}
+                <div class="alert alert-dismissible alert-success">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ msg }}
+                </div>
+            {% endfor %}
+            {% block body %}{% endblock %}
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

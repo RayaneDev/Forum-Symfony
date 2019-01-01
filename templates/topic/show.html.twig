@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum : {{ topic.title }} {% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-6">
+        <div class="pagination">
+            {{ knp_pagination_render(posts) }}
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="text-right">
+            <a href="{{ path('home_category', {slug: topic.category.slug}) }}" class="btn btn-primary">Retour sur la liste des sujets</a>
+            <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
+            <a href="#bottom" class="btn btn-secondary">Descendre</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h4>Titre : <a href="{{ path('topic_show', { id: topic.id, slug: topic.slug }) }}">{{ topic.title }}</a></h4>
+<hr>
+
+<div class="media px-2 py-2" style="background-color: #f2f2f2; color:#000;">
+  <img src="{% if not topic.user.avatar %}http://placehold.it/64x64{% else %}{{ topic.user.avatar}}{% endif %}" class="align-self-start mr-3" width="64" height="64" alt="...">
+  <div class="media-body">
+    <h5 class="mt-0"><a href="{{ path('user_show', {pseudo: topic.user.pseudo}) }}">{{ topic.user.pseudo}}</a></h5>
+    <span style="font-size: 0.8em;">{{ topic.createdAt | date('d/m/Y à H:i') }}</span>
+    <p>{{ topic.content }}</p>
+    {% if topic.user.signature %}
+        <hr>
+        <span class="signature">{{ topic.user.signature }}</span>
+    {% endif %}
+  </div>
+</div>
+
+
+
+{% for post in topic.posts %}
+
+
+<div class="media px-2 py-2" style="background-color: {% if loop.index is odd %} #FFF; {% else %} #f2f2f2; {% endif %} color:#000;" {% if loop.last %} id="lastPost" {% endif %}>
+  <img src="{% if not post.user.avatar %}http://placehold.it/64x64{% else %}{{ post.user.avatar}}{% endif %}" class="align-self-start mr-3" width="64" height="64" alt="...">
+  <div class="media-body">
+    <h5 class="mt-0 mb-0"><a href="{{ path('user_show', {pseudo: post.user.pseudo}) }}">{{ post.user.pseudo}}</a></h5>
+    <span style="font-size: 0.8em;">{{ post.createdAt | date('d/m/Y à H:i') }}</span>
+    <p>{{ post.content }}</p>
+    {% if post.user.signature %}
+        <hr>
+        <span class="signature">{{ post.user.signature }}</span>
+    {% endif %}
+  </div>
+
+</div>
+
+
+{% endfor %}
+
+
+<hr>
+
+<div class="row">
+    <div class="col-6">
+        <div class="pagination">
+            {{ knp_pagination_render(posts) }}
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="text-right">
+            <a href="{{ path('home_category', {slug: topic.category.slug}) }}" class="btn btn-primary">Retour sur la liste des sujets</a>
+            <a href="{{ app.request.uri }}#lastPost" class="btn btn-secondary">Actualiser</a>
+            <a href="#top" class="btn btn-secondary">Monter</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h4>Poster un message</h4>
+
+{% if app.user %}
+
+{{ form_start(formPost) }}
+
+{{ form_row(formPost.content, {label: 'Répondre'}) }}
+
+<button type="submit" class="btn btn-success">Poster</button>
+
+{{ form_end(formPost) }}
+
+{% else %}
+
+<p>Vous devez être connecté pour poster sur ce topic.<br /><a href="{{ path('login') }}" class="btn btn-success mt-3">Se connecter</a></p>
+
+{% endif %}
+
+<hr id="bottom">
+
+
+{% endblock %}

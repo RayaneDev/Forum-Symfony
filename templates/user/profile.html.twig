@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum : {{ user.pseudo }}{% endblock %}
+
+{% block body %}
+
+<div class="text-center mx-auto" style="width: 400px">
+
+    <h3>{% if app.user %}
+            {% if user.pseudo == app.user.pseudo %} 
+                Mon profil : {{ user.pseudo }}
+            {% else %}
+                Profil de {{ user.pseudo }}
+            {% endif %}
+        {% else %}
+            Profil de {{ user.pseudo }}
+        {% endif %}</h3>
+
+    {% if app.user %}
+        {% if user.pseudo == app.user.pseudo %}
+
+            {{ form_start(formProfil) }}
+
+            {{ form_row(formProfil.avatar) }}
+
+            {{ form_row(formProfil.signature) }}
+
+            {{ form_row(formProfil.description) }}
+
+            <button type="submit" class="btn btn-success">Modifier</button>
+
+            {{ form_end(formProfil) }}
+
+        {% endif %}
+    {% endif %} 
+
+        <p>
+            Avatar : <img src="{% if user.avatar %} {{ user.avatar }} {% else %} http://placehold.it/64x64 {% endif %}" width="64" height="64" /><br />
+            Signature : {{ user.signature }}<br />
+            Description : {{ user.description }}<br />
+            Nombre de posts : {{ user.getNbPosts }}
+        </p>
+
+
+</div>
+
+<hr>
+
+
+
+
+
+
+{% endblock %}
