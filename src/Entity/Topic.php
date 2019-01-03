@@ -50,7 +50,7 @@ class Topic
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="topic")
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="topic", orphanRemoval=true)
      */
     private $posts;
 
@@ -58,6 +58,11 @@ class Topic
      * @ORM\Column(type="string", length=255)
      */
     private $slug;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $editedAt;
 
     public function __construct()
     {
@@ -182,6 +187,18 @@ class Topic
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getEditedAt(): ?\DateTimeInterface
+    {
+        return $this->editedAt;
+    }
+
+    public function setEditedAt(?\DateTimeInterface $editedAt): self
+    {
+        $this->editedAt = $editedAt;
 
         return $this;
     }

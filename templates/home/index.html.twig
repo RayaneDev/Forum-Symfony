@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<h4>Catégories</h4>
+<h4>Forums</h4>
 
 <ul class="list-group">
 
@@ -31,13 +31,17 @@
     </div>
     <div class="col-6">
         <div class="text-right">
-            {{ form_start(formTopicSearch) }}
+            {{ form_start(formTopicSearch, {attr : { class : 'form-inline', style : 'display: inline;' }}) }}
 
-            {{ form_row(formTopicSearch.research, { attr: { placeholder: 'Recherche' }}) }}
+            <div class="form-group" style="display: inline">
 
-            {{ form_widget(formTopicSearch) }}
+                {{ form_widget(formTopicSearch.research, { attr: { placeholder: 'Recherche', class : 'form-inline' }}) }}
 
-            <button type="submit" class="btn btn-success">Rechercher</button>
+                {{ form_widget(formTopicSearch.section, { attr: { class : 'form-inline' }}) }}
+
+                <button type="submit" class="btn btn-success form-inline">Rechercher</button>
+
+            </div>
 
             {{ form_end(formTopicSearch) }}
 
@@ -56,23 +60,35 @@
       <th scope="col">Titre</th>
       <th scope="col">Pseudo</th>
       <th scope="col">Dernier MSG</th>
+      <th scope="col">Catégorie</th>
     </tr>
   </thead>
   <tbody>
     {% for topic in topics %}
     <tr>
-    {{ loop.index }}
       <td>{{ topic.getNbPosts }}</td>
       <td><a href="{{ path('topic_show', {slug: topic.slug, id: topic.id}) }}" style="display: block; width: 100%">{{ topic.title }}</a></td>
       <td><a href="{{ path('user_show', {pseudo: topic.user.pseudo}) }}" style="display: block; width: 100%">{{ topic.user.pseudo }}</a></td>
       <td>{{ topic.getLastPostDate | date('d/m/Y à H:i') }}</td>
+      <td><a href="{{ path('home_category', {slug: topic.category.slug}) }}">{{ topic.category.name }}</a></td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-<div class="pagination">
-    {{ knp_pagination_render(topics) }}
+<div class="row">
+
+<div class="col-6">
+    <div class="pagination">
+        {{ knp_pagination_render(topics) }}
+    </div>
+</div>
+<div class="col-6">
+    <div class="text-right">
+        <a href="#top" class="btn btn-secondary">Monter</a>
+    </div> 
+</div>
+
 </div>
 
 <hr>

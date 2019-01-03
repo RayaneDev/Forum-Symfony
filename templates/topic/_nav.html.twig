@@ -1,0 +1,22 @@
+
+{% block nav %}
+<div class="row">
+    <div class="col-4">
+        <div class="pagination">
+            {{ knp_pagination_render(posts) }}
+        </div>
+    </div>
+
+    <div class="col-8">
+        <div class="text-right">
+            <a href="{{ path('home_category', { slug: topic.category.slug }) }}" class="btn btn-primary">Retour sur la liste des sujets</a>
+            {% if nav == 'top' %}
+                {{ block('nav_top') }}
+            {% endif %}
+            {% if nav == 'bottom' %}
+                {{ block('nav_bottom') }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

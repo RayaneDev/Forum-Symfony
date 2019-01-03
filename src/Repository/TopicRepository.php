@@ -26,8 +26,8 @@ class TopicRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('t')
                     ->join('t.user', 'u')
                         ->addSelect('u')
-                        ->andWhere('u.pseudo = :pseudo')
-                        ->setParameter('pseudo', $author)
+                        ->where('u.pseudo LIKE :pseudo')
+                        ->setParameter('pseudo', '%'.$author.'%')
                         ->andWhere('t.category = :category')
                         ->setParameter('category', $category)
                         ->orderBy('t.id', 'DESC')
@@ -39,8 +39,8 @@ class TopicRepository extends ServiceEntityRepository
     public function findBySubject(string $subject, Category $category)
     {
         return $this->createQueryBuilder('t')
-                    ->andWhere('t.title = :subject')
-                    ->setParameter('subject', $subject)
+                    ->where('t.title LIKE :subject')
+                    ->setParameter('subject', '%'.$subject.'%')
                     ->andWhere('t.category = :category')
                     ->setParameter('category', $category)
                     ->orderBy('t.id', 'DESC')
@@ -51,12 +51,18 @@ class TopicRepository extends ServiceEntityRepository
 
     public function findByMessage(string $message, Category $category) 
     {
+
         return $this->createQueryBuilder('t')
-                    ->andWhere('t.category = :category')
-                    ->setParameter('category', $category)
-                        ->join('t.posts', 'p')
+                    ->join('t.posts', 'p')
+                        ->addSelect('p')
+                        ->where('p.content LIKE :message')
+                        ->setParameter('message', '%'.$message.'%')
+                        ->andWhere('t.category = :category')
+                        ->setParameter('category', $category)
+                        ->orderBy('t.id', 'DESC')
                         ->getQuery()
-                        ->getResult();
+                        ->getResult()
+        ; 
 
     }
 
