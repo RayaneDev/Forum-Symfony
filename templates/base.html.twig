@@ -24,7 +24,7 @@
                                 <a class="nav-link" href="{{ path('user_show', {pseudo : app.user.pseudo}) }}">Mon profil ({{ app.user.pseudo }}) {% if page == 'profile' %} <span class="sr-only">(current)</span> {% endif %}</a>
                             </li>
                             <li class="nav-item {% if page == 'messagerie' %} active {% endif %}">
-                                <a class="nav-link" href="{{ path('home_index') }}">Messagerie (0) {% if page == 'messagerie' %} <span class="sr-only">(current)</span> {% endif %}</a>
+                                <a class="nav-link" href="{{ path('message_index') }}">Messagerie (0) {% if page == 'messagerie' %} <span class="sr-only">(current)</span> {% endif %}</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -57,6 +57,7 @@
                 </div>
             {% endfor %}
             {% block body %}{% endblock %}
+            <hr id="bottom">
         </div>
 
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Messagerie {% endblock %}
+
+{% block body %}
+<h4>Messagerie</h4>
+
+<hr>
+
+<h5>Messages reçus</h5>
+
+<hr>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Titre</th>
+      <th scope="col">Auteur</th>
+      <th scope="col">Envoyé le</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for message in messages %}
+    <tr>
+      <td><a href="{{ path('message_show', {id: message.id}) }}" style="display: block; width: 100%">{{ message.title }}</a></td>
+      <td><a href="{{ path('user_show', {pseudo: message.author.pseudo }) }}" style="display: block; width: 100%">{{ message.author.pseudo }}</a></td>
+      <td>{{ message.createdAt | date('d/m/Y à H:i') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+
+<h5>Envoyer un message</h5>
+
+<hr>
+
+{{ form_start(form) }}
+
+{{ form_widget(form) }}
+
+<button type="submit" class="btn btn-success">Envoyer</button>
+
+{{ form_end(form) }}
+
+
+
+{% endblock %}

@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block nav_bottom %}
-    <a href="{{ app.request.uri }}#lastPost" class="btn btn-secondary">Actualiser</a>
+    <a href="{{ app.request.uri }}#bottom" class="btn btn-secondary">Actualiser</a>
     <a href="#top" class="btn btn-secondary">Monter</a>
     {% if app.user %}
         {% if app.user.pseudo == topic.user.pseudo %}
@@ -45,26 +45,35 @@
     <div class="media-body">
         <h5 class="mt-0 mb-0"><a href="{{ path('user_show', { pseudo: topic.user.pseudo}) }}">{{ topic.user.pseudo}}</a></h5>
         <span style="font-size: 0.8em; color: gray;">{{ topic.createdAt | date('d/m/Y à H:i') }}</span>
-        <p class="mt-3">{{ topic.content }}</p>
+        <p class="mt-3">{{ topic.content | nl2br }}</p>
         {% if topic.user.signature %}
-            <hr>
             {% if topic.editedAt %}
-                <span>Ce topic a été édité le {{ topic.getEditedAt | date('d/m/Y à H:i') }}<br /></span>
+                <span style="color: gray;">Ce topic a été édité le {{ topic.getEditedAt | date('d/m/Y à H:i') }}<br /></span>
             {% endif %}
+            <hr>
             <span style="color: gray;" class="signature">{{ topic.user.signature }}</span>
         {% endif %}
     </div>
 </div>
 
+<hr>
+
 
 {% for p in posts %}
 
-<div class="media px-2 py-2 mb-2" style="background-color: #303030;  border-radius: 5px;" {% if loop.last == loop.index %} id="lastPost" {% endif %} data-id="{{ p.id }}">
+<div class="media px-2 py-2 mb-2" style="background-color: #303030;  border-radius: 5px;" id="{{ p.id }}">
     <img src="{% if not p.user.avatar %}http://placehold.it/64x64{% else %}{{ p.user.avatar}}{% endif %}" class="align-self-start mr-3" width="64" height="64" alt="Avatar de l'auteur du post">
     <div class="media-body">
         <h5 class="mt-0 mb-0"><a href="{{ path('user_show', { pseudo: p.user.pseudo}) }}">{{ p.user.pseudo}}</a></h5>
         <span style="font-size: 0.8em; color: gray;">{{ p.createdAt | date('d/m/Y à H:i') }}</span>
-        <p class="mt-3">{{ p.content }}</p>
+        <p class="mt-3">{{ p.content | nl2br }}</p>
+        {% if p.editedAt %}
+            <span style="color: gray;">Post édité le {{ p.editedAt | date('d/m/Y à H:i') }}</span><br />
+        {% endif %}
+        {% if (app.user and app.user == p.user) %}
+            <a href="{{ path('post_edit', {id: p.id, page: app.request.get('page')}) }}#bottom">Éditer</a>
+            <a href="{{ path('post_remove', { id: p.id, token: csrf_token('delete-post') }) }}?page={{ app.request.get('page') }}">Supprimer</a>
+        {% endif %}
         {% if p.user.signature %}
             <hr>
             <span style="color: gray;" class="signature">{{ p.user.signature }}</span>
@@ -83,43 +92,28 @@
 
 <hr>
 
+{% if app.user %}
+    {% if (editPostMode or editTopicMode) %} <h4>Éditer</h4> {% endif %}
+    {% if not (editPostMode or editTopicMode) %} <h4>Répondre</h4> {% endif %}
 
-{% if formPost %}
-    <h4>Répondre</h4>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
 
-    {{ form_start(formPost) }}
+    {% if (editPostMode or editTopicMode) %} 
+        <button type="submit" class="btn btn-success">Éditer</button> 
+    {% else %}
+        <button type="submit" class="btn btn-success">Poster</button>
+    {% endif %}
+    
 
-    {{ form_row(formPost.content, { attr: { placeholder: 'N\'oubliez pas d\'être poli.e !' }}) }}
+    {{ form_end(form) }}
 
-    <button type="submit" class="btn btn-success">Poster</button>
 
-    {{ form_end(formPost) }}
 {% else %}
-    {% if not app.user %}
-        <p>Vous devez être connecté pour poster sur ce topic.<br /><a href="{{ path('login') }}" class="btn btn-success mt-3">Se connecter</a></p>
-    {% endif %}
+
+    <p>Vous devez être connecté pour poster sur ce topic.<br /><a href="{{ path('login') }}" class="btn btn-success mt-3">Se connecter</a></p>
+
 {% endif %}
-
-{% if formTopic %}
-    {% if app.user.pseudo == topic.user.pseudo %}
-        <h4>Éditer le topic</h4>
-
-        {{ form_start(formTopic) }}
-
-        {{ form_row(formTopic.title) }}
-        {{ form_row(formTopic.content) }}
-
-        <button type="submit" class="btn btn-success">Éditer</button>
-
-        {{ form_end(formTopic) }}
-    {% endif %}
-{% else %}
-    {% if not app.user %}
-        <p>Vous devez être connecté pour éditer ce topic.<br /><a href="{{ path('login') }}" class="btn btn-success mt-3">Se connecter</a></p>
-    {% endif %}
-{% endif %}
-
-<hr id="bottom">
 
 
 {% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Message : {{ message.title }} {% endblock %}
+
+{% block body %}
+<h4>Messagerie</h4>
+
+<div class="row">
+    <div class="col-4">
+        <div class="pagination">
+            {{ knp_pagination_render(answers) }}
+        </div>
+    </div>
+
+    <div class="col-8">
+        <div class="text-right">
+            <a href="{{ path('message_index') }}" class="btn btn-primary">Messagerie</a>
+            <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
+            <a href="#bottom" class="btn btn-secondary">Descendre</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h5>Titre du message : {{ message.title }}</h5>
+
+<div class="media px-2 py-2 mb-2" style="background-color: #303030;  border-radius: 5px;" id="{{ message.id }}">
+    <img src="{% if not message.author.avatar %}http://placehold.it/64x64{% else %}{{ message.author.avatar}}{% endif %}" class="align-self-start mr-3" width="64" height="64" alt="Avatar de l'auteur du post">
+    <div class="media-body">
+        <h5 class="mt-0 mb-0"><a href="{{ path('user_show', { pseudo: message.author.pseudo}) }}">{{ message.author.pseudo}}</a></h5>
+        <span style="font-size: 0.8em; color: gray;">{{ message.createdAt | date('d/m/Y à H:i') }}</span>
+        <p class="mt-3">{{ message.content }}</p>
+        {% if message.author.signature %}
+            <hr>
+            <span style="color: gray;" class="signature">{{ message.author.signature }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+
+{% for answer in answers %}
+
+<div class="media px-2 py-2 mb-2" style="background-color: #303030;  border-radius: 5px;" id="{{ answer.id }}">
+    <img src="{% if not answer.author.avatar %}http://placehold.it/64x64{% else %}{{ answer.author.avatar}}{% endif %}" class="align-self-start mr-3" width="64" height="64" alt="Avatar de l'auteur du post">
+    <div class="media-body">
+        <h5 class="mt-0 mb-0"><a href="{{ path('user_show', { pseudo: answer.author.pseudo}) }}">{{ answer.author.pseudo}}</a></h5>
+        <span style="font-size: 0.8em; color: gray;">{{ answer.createdAt | date('d/m/Y à H:i') }}</span>
+        <p class="mt-3">{{ answer.content }}</p>
+        {% if answer.author.signature %}
+            <hr>
+            <span style="color: gray;" class="signature">{{ answer.author.signature }}</span>
+        {% endif %}
+    </div>
+</div>
+
+{% endfor %}
+
+<h5>Répondre</h5>
+
+{{ form_start(form) }}
+
+{{ form_widget(form) }}
+
+<button type="submit" class="btn btn-success">Envoyer</button>
+
+{{ form_end(form) }}
+
+<hr>
+
+<div class="row">
+    <div class="col-4">
+        <div class="pagination">
+            {{ knp_pagination_render(answers) }}
+        </div>
+    </div>
+
+    <div class="col-8">
+        <div class="text-right">
+            <a href="{{ path('message_index') }}" class="btn btn-primary">Messagerie</a>
+            <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
+            <a href="#top" class="btn btn-secondary">Monter</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

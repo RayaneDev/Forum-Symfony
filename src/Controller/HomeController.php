@@ -115,9 +115,6 @@ class HomeController extends AbstractController
                     break; 
                 case 'author': 
                     $results = $this->topicRepo->findByAuthor($topicSearch->getResearch(), $currCategory); 
-                    break; 
-                case 'message': 
-                    $results = $this->topicRepo->findByMessage($topicSearch->getResearch(), $currCategory); 
                     break;
             }
 
@@ -126,7 +123,7 @@ class HomeController extends AbstractController
         $topics = $paginator->paginate(
             $results, 
             $request->query->getInt('page', 1), 
-            20
+            15
         );
 
 

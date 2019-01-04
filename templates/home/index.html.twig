@@ -24,12 +24,12 @@
 
 
 <div class="row">
-    <div class="col-6">
+    <div class="col-4">
         <div class="pagination">
             {{ knp_pagination_render(topics) }}
         </div>
     </div>
-    <div class="col-6">
+    <div class="col-8">
         <div class="text-right">
             {{ form_start(formTopicSearch, {attr : { class : 'form-inline', style : 'display: inline;' }}) }}
 
@@ -46,6 +46,7 @@
             {{ form_end(formTopicSearch) }}
 
             <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
+            <a href="#bottom" class="btn btn-secondary">Descendre</a>
         </div>
     </div>
 </div>
@@ -56,9 +57,9 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">Posts</th>
       <th scope="col">Titre</th>
       <th scope="col">Pseudo</th>
+      <th scope="col">Posts</th>
       <th scope="col">Dernier MSG</th>
       <th scope="col">Catégorie</th>
     </tr>
@@ -66,15 +67,17 @@
   <tbody>
     {% for topic in topics %}
     <tr>
-      <td>{{ topic.getNbPosts }}</td>
       <td><a href="{{ path('topic_show', {slug: topic.slug, id: topic.id}) }}" style="display: block; width: 100%">{{ topic.title }}</a></td>
       <td><a href="{{ path('user_show', {pseudo: topic.user.pseudo}) }}" style="display: block; width: 100%">{{ topic.user.pseudo }}</a></td>
+      <td>{{ topic.getNbPosts }}</td>
       <td>{{ topic.getLastPostDate | date('d/m/Y à H:i') }}</td>
       <td><a href="{{ path('home_category', {slug: topic.category.slug}) }}">{{ topic.category.name }}</a></td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<hr>
 
 <div class="row">
 
@@ -85,6 +88,7 @@
 </div>
 <div class="col-6">
     <div class="text-right">
+        <a href="{{ app.request.uri }}" class="btn btn-secondary">Actualiser</a>
         <a href="#top" class="btn btn-secondary">Monter</a>
     </div> 
 </div>

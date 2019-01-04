@@ -31,15 +31,24 @@ class TopicController extends AbstractController
     /**
      * @Route("/topic/{slug}/{id}", name="topic_show")
      * @Route("/topic/edit/{slug}/{id}", name="topic_edit")
+     * @Route("/post/edit/{id}", name="post_edit")
      */
-    public function index(Topic $topic, Request $request, PaginatorInterface $paginator)
+    public function index(Topic $topic = null, Request $request, PaginatorInterface $paginator)
     {
-        $post = new Post(); 
+        $editPostMode = ($request->attributes->get('_route') == 'post_edit');
+        $editTopicMode = ($request->attributes->get('_route') == 'topic_edit');
 
-        $formPost = null; 
-        $formTopic = null; 
+        $user = $this->getUser(); 
+        $form = null; // Form utilisé pour l'édition d'un topic et d'un post et la soumission d'un post
 
-        $user = $this->getUser();
+        if ($editPostMode) {
+            $post = $this->postRepo->findOneBy([
+                'id' => $request->attributes->get('id')
+            ]); 
+            $topic = $post->getTopic(); 
+        } else {
+            $post = new Post(); 
+        }
 
         $posts = $paginator->paginate(
             $this->postRepo->findBy([
@@ -49,53 +58,81 @@ class TopicController extends AbstractController
             20
         );
 
+        if (empty($user)) {
+            if ($editPostMode || $editTopicMode) {
+                return $this->redirectToRoute('home_index');
+            }
+        } else {
 
-        if (!empty($user)) {
+            if ($editTopicMode) {
+    
+                if (!empty($topic) && !empty($this->getUser()) && $user == $topic->getUser()) {
+                    // On génère le formulaire d'édition de topic 
+                    $form = $this->createForm(TopicType::class, $topic); 
 
-            if ($request->attributes->get('_route') == 'topic_edit' && $user->getPseudo() == $topic->getUser()->getPseudo()) {
-            
-                $formTopic = $this->createForm(TopicType::class, $topic); 
-    
-                $formTopic->handleRequest($request); 
-    
-                if ($formTopic->isSubmitted() && $formTopic->isValid()) {
-                    $topic->setTitle($topic->getTitle()); 
-                    $topic->setContent($topic->getContent()); 
-                    $topic->setEditedAt(new \DateTime()); 
-    
-                    $this->manager->persist($topic); 
-                    $this->manager->flush(); 
+                    $form->handleRequest($request); 
 
-                    return $this->redirectToRoute('topic_show', array(
-                        'id' => $topic->getId(),
-                        'slug' => $topic->getSlug(),
-                        'page' => 1,
-                        '_fragment' => 'top'
-                    ));
-                    
-                }
-            } else {
-                $formPost = $this->createForm(PostType::class, $post); 
+                    if ($form->isSubmitted() && $form->isValid()) {
+
+                        $topic->setEditedAt(new \DateTime()); 
+        
+                        $this->manager->persist($topic); 
+                        $this->manager->flush(); 
     
-                $formPost->handleRequest($request); 
-    
-                if ($formPost->isSubmitted() && $formPost->isValid()) {
-                
-                    if (!$post->getId()) {
-                        $post->setCreatedAt(new \DateTime()); 
+                        return $this->redirectToRoute('topic_show', array(
+                            'id' => $topic->getId(),
+                            'slug' => $topic->getSlug(),
+                            'page' => 1,
+                            '_fragment' => 'top'
+                        ));
+                        
                     }
+                }
+    
+            } else {
+
+                if ($editPostMode) {
+
+                    $page = (empty($request->query->get('page'))) ? 1 : $request->query->get('page'); 
         
-                    $post->setUser($user); 
-                    $post->setTopic($topic); 
+                    $topic = $post->getTopic(); 
+                    $fragment = $post->getId();
+                    
+                } else {
+
+                    $page = ($posts->getPageCount() > 0) ? $posts->getPageCount() : 1; 
+                    $fragment = 'bottom'; 
+                }
+
+
+                $form = $this->createForm(PostType::class, $post); 
         
-                    $this->manager->persist($post); 
+                $form->handleRequest($request); 
+            
+                if ($form->isSubmitted() && $form->isValid()) {
+                        
+                    if (!$post->getId()) {
+    
+                        $post->setCreatedAt(new \DateTime()); 
+    
+                        $post->setUser($user); 
+                        $post->setTopic($topic); 
+    
+                        $this->manager->persist($post); 
+                    } else {
+                        if ($user == $post->getUser()) {
+                            $post->setEditedAt(new \Datetime());
+                            $this->manager->persist($post); 
+                        }
+                    }
+    
                     $this->manager->flush(); 
-        
+  
                     return $this->redirectToRoute('topic_show', array(
                         'id' => $topic->getId(),
                         'slug' => $topic->getSlug(),
-                        'page' => $posts->getPageCount(),
-                        '_fragment' => 'lastPost'
+                        'page' => $page, 
+                        '_fragment' => $fragment
                     ));
                 }
             }
@@ -105,8 +142,9 @@ class TopicController extends AbstractController
             'page' => 'topic',
             'topic' => $topic, 
             'posts' => $posts,
-            'formPost' => (($formPost !== null) ? $formPost->createView() : null), 
-            'formTopic' => (($formTopic !== null) ? $formTopic->createView() : null)
+            'form' => ($form != null) ? $form->createView() : null,
+            'editPostMode' => $editPostMode, 
+            'editTopicMode' => $editTopicMode
         ]);
     }
 
@@ -117,9 +155,6 @@ class TopicController extends AbstractController
     {
         
         if ($this->getUser()->getPseudo() == $topic->getUser()->getPseudo()) {
-
-        
-           
 
             $token = $request->attributes->get('token');
 

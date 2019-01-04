@@ -20,8 +20,7 @@ class TopicSearchType extends AbstractType
             ->add('section', ChoiceType::class, array(
                 'choices' => array(
                     'Sujet' => 'title', 
-                    'Auteur' => 'author', 
-                    'Message' => 'message'
+                    'Auteur' => 'author'
                 ), 
                 'label' => False
             ))

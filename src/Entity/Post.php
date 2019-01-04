@@ -41,6 +41,11 @@ class Post
      */
     private $topic;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $editedAt;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +95,18 @@ class Post
     public function setTopic(?Topic $topic): self
     {
         $this->topic = $topic;
+
+        return $this;
+    }
+
+    public function getEditedAt(): ?\DateTimeInterface
+    {
+        return $this->editedAt;
+    }
+
+    public function setEditedAt(?\DateTimeInterface $editedAt): self
+    {
+        $this->editedAt = $editedAt;
 
         return $this;
     }
